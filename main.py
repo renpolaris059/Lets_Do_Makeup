@@ -173,6 +173,7 @@ class MakeupUI(QtWidgets.QDialog):
             layout.addWidget(label)
             return widget
 
+        num_columns = 2
         for i, icon_path in enumerate(icons):
             btn = QtWidgets.QPushButton()
             btn.setFixedSize(80, 80)
@@ -189,7 +190,7 @@ class MakeupUI(QtWidgets.QDialog):
                     background-color: #f2e9ff;
                 }
             ''')
-            layout.addWidget(btn, i // 2, i % 2)
+            layout.addWidget(btn, i // num_columns, i % num_columns)
 
         return widget
 
