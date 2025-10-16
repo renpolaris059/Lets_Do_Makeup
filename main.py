@@ -8,7 +8,6 @@ except:
 import maya.OpenMayaUI as omui
 import os
 
-# 🔸 กำหนดโฟลเดอร์ของแต่ละหมวด (ชื่อหมวด = ชื่อโฟลเดอร์)
 ICON_FOLDERS = {
     "Foundation": "foundation_folder",
     "Blush": "blush_folder",
@@ -20,7 +19,6 @@ ICON_FOLDERS = {
     "Accessory": "accessory_folder"
 }
 
-# 🔸 ฟังก์ชันโหลด path ของภาพทั้งหมดในโฟลเดอร์
 def load_icons_from_folder(folder_path):
     if not os.path.exists(folder_path):
         return []
@@ -39,12 +37,10 @@ class MakeupUI(QtWidgets.QDialog):
         self.resize(900, 650)
         self.setStyleSheet('background-color: #c8bfe7;')
 
-        # 🟣 MAIN LAYOUT
         self.mainLayout = QtWidgets.QHBoxLayout(self)
         self.mainLayout.setSpacing(15)
         self.mainLayout.setContentsMargins(15, 15, 15, 15)
 
-        # ---------------- Left (Face Preview) ----------------
         self.facePreview = QtWidgets.QLabel("Face Preview")
         self.facePreview.setAlignment(QtCore.Qt.AlignCenter)
         self.facePreview.setStyleSheet('''
@@ -59,7 +55,6 @@ class MakeupUI(QtWidgets.QDialog):
         self.facePreview.setFixedSize(400, 520)
         self.mainLayout.addWidget(self.facePreview)
 
-        # ---------------- Middle (Category Buttons) ----------------
         self.categoryFrame = QtWidgets.QFrame()
         self.categoryLayout = QtWidgets.QVBoxLayout(self.categoryFrame)
         self.categoryLayout.setSpacing(5)
@@ -97,7 +92,6 @@ class MakeupUI(QtWidgets.QDialog):
         self.categoryFrame.setFixedSize(160, 520)
         self.mainLayout.addWidget(self.categoryFrame)
 
-        # ---------------- Right (Stack of Grid Pages) ----------------
         self.rightLayout = QtWidgets.QVBoxLayout()
         self.mainLayout.addLayout(self.rightLayout, stretch=2)
 
@@ -115,7 +109,6 @@ class MakeupUI(QtWidgets.QDialog):
         self.stack = QtWidgets.QStackedWidget()
         self.gridOuterLayout.addWidget(self.stack)
 
-        # 🔹 สร้างหน้า grid สำหรับแต่ละหมวด
         base_dir = os.path.dirname(__file__)
         for name in self.categoryButtons:
             folder_path = os.path.join(base_dir, ICON_FOLDERS[name])
@@ -125,7 +118,6 @@ class MakeupUI(QtWidgets.QDialog):
         self.gridOuterFrame.setFixedSize(250, 520)
         self.rightLayout.addWidget(self.gridOuterFrame, alignment=QtCore.Qt.AlignCenter)
 
-        # ---------------- Navigation Buttons ----------------
         self.navLayout = QtWidgets.QHBoxLayout()
         self.backBtn = QtWidgets.QPushButton("Back")
         self.nextBtn = QtWidgets.QPushButton("Next")
@@ -151,14 +143,12 @@ class MakeupUI(QtWidgets.QDialog):
         self.navLayout.addWidget(self.nextBtn)
         self.rightLayout.addLayout(self.navLayout)
 
-        # ---------------- Connect Events ----------------
         self.categoryGroup.buttons()[0].setChecked(True)
         self.categoryGroup.buttonClicked.connect(self.switchCategory)
         self.backBtn.clicked.connect(self.goBack)
         self.nextBtn.clicked.connect(self.goNext)
         self.updateNavButtons()
 
-    # 🔸 สร้างหน้ารวมปุ่มไอคอน
     def createGridPage(self, category, folder_path):
         widget = QtWidgets.QWidget()
         layout = QtWidgets.QGridLayout(widget)
@@ -194,13 +184,11 @@ class MakeupUI(QtWidgets.QDialog):
 
         return widget
 
-    # 🔸 เปลี่ยนหน้าเมื่อเลือกหมวด
     def switchCategory(self, button):
         index = self.categoryGroup.id(button)
         self.stack.setCurrentIndex(index)
         self.updateNavButtons()
 
-    # 🔸 ปุ่ม Next / Back
     def goNext(self):
         index = self.stack.currentIndex()
         if index < self.stack.count() - 1:
@@ -223,8 +211,6 @@ class MakeupUI(QtWidgets.QDialog):
         self.backBtn.setEnabled(index > 0)
         self.nextBtn.setText("Finish" if index == count - 1 else "Next")
 
-
-# 🔹 ฟังก์ชันเปิด UI ใน Maya
 def run():
     global ui
     try:
