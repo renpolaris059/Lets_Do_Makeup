@@ -5,8 +5,11 @@ except:
     from PySide2 import QtCore, QtGui, QtWidgets
     from shiboken2 import wrapInstance
 
+from . import util
 import maya.OpenMayaUI as omui
 import os
+
+FACE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'face_folder'))
 
 ICON_FOLDERS = {
     "Foundation": "foundation_folder",
@@ -16,7 +19,7 @@ ICON_FOLDERS = {
     "Lip": "lip_folder",
     "Hairstyle": "hair_folder",
     "Clothes": "clothes_folder",
-    "Accessory": "accessory_folder"
+    "Accessory": "accessory_folder",
 }
 
 def load_icons_from_folder(folder_path):
@@ -34,26 +37,36 @@ class MakeupUI(QtWidgets.QDialog):
         super().__init__(parent)
 
         self.setWindowTitle("Let's Do Makeup !")
-        self.resize(900, 650)
+        self.resize(800, 650)
         self.setStyleSheet('background-color: #c8bfe7;')
 
         self.mainLayout = QtWidgets.QHBoxLayout(self)
         self.mainLayout.setSpacing(15)
         self.mainLayout.setContentsMargins(15, 15, 15, 15)
+        self.setLayout(self.mainLayout)
 
-        self.facePreview = QtWidgets.QLabel("Face Preview")
-        self.facePreview.setAlignment(QtCore.Qt.AlignCenter)
-        self.facePreview.setStyleSheet('''
-            QLabel {
-                color: black;
-                background-color: white;
-                border: 3px solid black;
-                font-size: 20px;
-                font-weight: bold;
-            }
+        self.preview_w = 380
+        self.preview_h = 650
+
+        self.faceScene = QtWidgets.QGraphicsScene()
+        self.faceScene.setSceneRect(0, 0, self.preview_w, self.preview_h)
+        self.faceView = QtWidgets.QGraphicsView(self.faceScene)
+        self.faceView.setFixedSize(self.preview_w, self.preview_h)
+        self.faceView.setStyleSheet('''
+            QGraphicsView {
+                border: 3px solid #c8bfe7;
+                background-color: #c8bfe7;
+        }
         ''')
-        self.facePreview.setFixedSize(400, 520)
-        self.mainLayout.addWidget(self.facePreview)
+        self.faceView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.faceView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.faceView.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform)
+        self.faceView.setViewportUpdateMode(QtWidgets.QGraphicsView.BoundingRectViewportUpdate)
+        self.mainLayout.addWidget(self.faceView)
+
+        face = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap(f'{FACE_DIR}/blank'))
+        face.setZValue(0)
+        self.faceScene.addItem(face)
 
         self.categoryFrame = QtWidgets.QFrame()
         self.categoryLayout = QtWidgets.QVBoxLayout(self.categoryFrame)
@@ -76,7 +89,7 @@ class MakeupUI(QtWidgets.QDialog):
                 }
                 QPushButton:hover {
                     color: white;
-                    background-color: #a69ebf;
+                    background-color: #a59ebe;
                     border: 2px solid white;
                 }
                 QPushButton:checked {
@@ -99,7 +112,7 @@ class MakeupUI(QtWidgets.QDialog):
         self.gridOuterFrame.setStyleSheet('''
             QFrame {
                 background-color: white;
-                border: 3px solid black;
+                border: 2.2px solid black;
                 border-radius: 10px;
             }
         ''')
@@ -109,20 +122,22 @@ class MakeupUI(QtWidgets.QDialog):
         self.stack = QtWidgets.QStackedWidget()
         self.gridOuterLayout.addWidget(self.stack)
 
-        base_dir = os.path.dirname(__file__)
         for name in self.categoryButtons:
             folder_path = os.path.join(base_dir, ICON_FOLDERS[name])
             page = self.createGridPage(name, folder_path)
             self.stack.addWidget(page)
 
-        self.gridOuterFrame.setFixedSize(250, 520)
+        self.gridOuterFrame.setFixedSize(250, 590)
+        self.stack.setStyleSheet('border-radius:6px;')
         self.rightLayout.addWidget(self.gridOuterFrame, alignment=QtCore.Qt.AlignCenter)
 
-        self.navLayout = QtWidgets.QHBoxLayout()
-        self.backBtn = QtWidgets.QPushButton("Back")
-        self.nextBtn = QtWidgets.QPushButton("Next")
+        self.nextAndBackButtonLayout = QtWidgets.QHBoxLayout()
+        self.backButton = QtWidgets.QPushButton("Back")
+        self.backButton.setFixedSize(125, 100)
+        self.nextButton = QtWidgets.QPushButton("Next")
+        self.nextButton.setFixedSize(125, 100)
 
-        for btn in (self.backBtn, self.nextBtn):
+        for btn in (self.backButton, self.nextButton):
             btn.setFixedHeight(40)
             btn.setStyleSheet('''
                 QPushButton {
@@ -135,19 +150,19 @@ class MakeupUI(QtWidgets.QDialog):
                 }
                 QPushButton:hover {
                     color: white;
-                    background-color: #a69ebf;
+                    background-color: #a59ebe;
                     border: 2px solid black;
                 }
             ''')
-        self.navLayout.addWidget(self.backBtn)
-        self.navLayout.addWidget(self.nextBtn)
-        self.rightLayout.addLayout(self.navLayout)
+        self.nextAndBackButtonLayout.addWidget(self.backButton)
+        self.nextAndBackButtonLayout.addWidget(self.nextButton)
+        self.rightLayout.addLayout(self.nextAndBackButtonLayout)
 
         self.categoryGroup.buttons()[0].setChecked(True)
         self.categoryGroup.buttonClicked.connect(self.switchCategory)
-        self.backBtn.clicked.connect(self.goBack)
-        self.nextBtn.clicked.connect(self.goNext)
-        self.updateNavButtons()
+        self.backButton.clicked.connect(self.goBack)
+        self.nextButton.clicked.connect(self.goNext)
+        self.updateNextBackButtons()
 
     def createGridPage(self, category, folder_path):
         widget = QtWidgets.QWidget()
@@ -176,7 +191,7 @@ class MakeupUI(QtWidgets.QDialog):
                     background-color: white;
                 }
                 QPushButton:hover {
-                    border: 3px solid #a69ebf;
+                    border: 3px solid #a59ebe;
                     background-color: #f2e9ff;
                 }
             ''')
@@ -187,7 +202,14 @@ class MakeupUI(QtWidgets.QDialog):
     def switchCategory(self, button):
         index = self.categoryGroup.id(button)
         self.stack.setCurrentIndex(index)
-        self.updateNavButtons()
+        self.updateNextBackButtons()
+
+    def goBack(self):
+        index = self.stack.currentIndex()
+        if index > 0:
+            self.stack.setCurrentIndex(index - 1)
+            self.categoryGroup.buttons()[index - 1].setChecked(True)
+        self.updateNextBackButtons()
 
     def goNext(self):
         index = self.stack.currentIndex()
@@ -196,20 +218,13 @@ class MakeupUI(QtWidgets.QDialog):
             self.categoryGroup.buttons()[index + 1].setChecked(True)
         elif index == self.stack.count() - 1:
             QtWidgets.QMessageBox.information(self, "Let's Do Makeup !", "FINISH")
-        self.updateNavButtons()
+        self.updateNextBackButtons()
 
-    def goBack(self):
-        index = self.stack.currentIndex()
-        if index > 0:
-            self.stack.setCurrentIndex(index - 1)
-            self.categoryGroup.buttons()[index - 1].setChecked(True)
-        self.updateNavButtons()
-
-    def updateNavButtons(self):
+    def updateNextBackButtons(self):
         index = self.stack.currentIndex()
         count = self.stack.count()
-        self.backBtn.setEnabled(index > 0)
-        self.nextBtn.setText("Finish" if index == count - 1 else "Next")
+        self.backButton.setEnabled(index > 0)
+        self.nextButton.setText("Finish" if index == count - 1 else "Next")
 
 def run():
     global ui
