@@ -45,8 +45,8 @@ class MakeupUI(QtWidgets.QDialog):
         self.mainLayout.setContentsMargins(15, 15, 15, 15)
         self.setLayout(self.mainLayout)
 
-        self.preview_w = 380
-        self.preview_h = 650
+        self.preview_w = 650
+        self.preview_h = 650 #fixed
 
         self.faceScene = QtWidgets.QGraphicsScene()
         self.faceScene.setSceneRect(0, 0, self.preview_w, self.preview_h)
@@ -123,7 +123,7 @@ class MakeupUI(QtWidgets.QDialog):
         self.gridOuterLayout.addWidget(self.stack)
 
         for name in self.categoryButtons:
-            folder_path = os.path.join(base_dir, ICON_FOLDERS[name])
+            folder_path = os.path.join(os.path.dirname(__file__), ICON_FOLDERS[name])
             page = self.createGridPage(name, folder_path)
             self.stack.addWidget(page)
 
