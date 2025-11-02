@@ -262,8 +262,6 @@ class MakeupUI(QtWidgets.QDialog) :
         if index < self.stack.count() - 1 :
             self.stack.setCurrentIndex(index + 1)
             self.categoryGroup.buttons()[index + 1].setChecked(True)
-        elif index == self.stack.count() - 1 :
-            QtWidgets.QMessageBox.information(self, "Let's Do Makeup !", "FINISH")
         self.updateNextBackButtons()
 
     def updateNextBackButtons(self) :
