@@ -51,11 +51,11 @@ class MakeupUI(QtWidgets.QDialog) :
 
         self.setWindowTitle("Let's Do Makeup !")
         self.resize(800, 650)
-        self.setStyleSheet('background-color: #c8bfe7 ;')
+        self.setStyleSheet('background-color: #c8bfe7;')
 
         self.preview_w = 650
         self.preview_h = 650
-        self.layers = {layer : None for layer in CATEGORY_TO_LAYER.values()}
+        self.layers = {layer: None for layer in CATEGORY_TO_LAYER.values()}
 
         self.mainLayout = QtWidgets.QHBoxLayout(self)
         self.mainLayout.setSpacing(15)
@@ -74,7 +74,7 @@ class MakeupUI(QtWidgets.QDialog) :
 
         self.faceView = QtWidgets.QGraphicsView(self.faceScene)
         self.faceView.setFixedSize(self.preview_w, self.preview_h)
-        self.faceView.setStyleSheet('border : 3px solid #c8bfe7 ; background-color : white ;')
+        self.faceView.setStyleSheet('border: 3px solid #c8bfe7; background-color: white;')
         self.faceView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.faceView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.faceView.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform)
@@ -91,28 +91,27 @@ class MakeupUI(QtWidgets.QDialog) :
                                 "Lip", "Hairstyle", "Clothes", "Accessory"]
 
         self.categoryGroup = QtWidgets.QButtonGroup(self)
-
         for i, name in enumerate(self.categoryButtons) :
             btn = QtWidgets.QPushButton(f"{i + 1}. {name}")
             btn.setCheckable(True)
             btn.setStyleSheet('''
                 QPushButton {
-                    color : black ;
-                    background-color : white ;
-                    border : 1px solid black ;
-                    border-radius : 6px ;
-                    padding : 5px ;
+                    color: black;
+                    background-color: white;
+                    border: 1px solid black;
+                    border-radius: 6px;
+                    padding: 5px;
                 }
-                QPushButton : hover {
-                    color : white ;
-                    background-color: #a59ebe ;
-                    border : 2px solid white ;
+                QPushButton:hover {
+                    color: white;
+                    background-color: #a59ebe;
+                    border: 2px solid white;
                 }
-                QPushButton : checked {
-                    color : white ;
-                    background-color : #8b7abf ;
-                    border : 2px solid white ;
-                    font-weight : bold ;
+                QPushButton:checked {
+                    color: white;
+                    background-color: #8b7abf;
+                    border: 2px solid white;
+                    font-weight: bold;
                 }
             ''')
             self.categoryGroup.addButton(btn, i)
@@ -128,9 +127,9 @@ class MakeupUI(QtWidgets.QDialog) :
         self.gridOuterFrame = QtWidgets.QFrame()
         self.gridOuterFrame.setStyleSheet('''
             QFrame {
-                background-color : white ;
-                border : 2.2px solid black ;
-                border-radius : 10px ;
+                background-color: white;
+                border: 2.2px solid black;
+                border-radius: 10px;
             }
         ''')
         self.gridOuterLayout = QtWidgets.QVBoxLayout(self.gridOuterFrame)
@@ -139,33 +138,33 @@ class MakeupUI(QtWidgets.QDialog) :
         self.stack = QtWidgets.QStackedWidget()
         self.gridOuterLayout.addWidget(self.stack)
 
-        for name in self.categoryButtons :
+        for name in self.categoryButtons:
             folder_path = os.path.join(BASE_DIR, ICON_FOLDERS[name])
             page = self.createGridPage(name, folder_path)
             self.stack.addWidget(page)
 
         self.gridOuterFrame.setFixedSize(250, 590)
-        self.stack.setStyleSheet('border-radius : 6px ;')
+        self.stack.setStyleSheet('border-radius:6px;')
         self.rightLayout.addWidget(self.gridOuterFrame, alignment=QtCore.Qt.AlignCenter)
 
         self.nextAndBackButtonLayout = QtWidgets.QHBoxLayout()
         self.backButton = QtWidgets.QPushButton("Back")
         self.nextButton = QtWidgets.QPushButton("Next")
-        for btn in (self.backButton, self.nextButton) :
+        for btn in (self.backButton, self.nextButton):
             btn.setFixedSize(125, 40)
             btn.setStyleSheet('''
                 QPushButton {
-                    color : black ;
-                    background-color : white ;
-                    border : 2px solid black ;
-                    border-radius : 8px ;
-                    font-weight : bold ;
-                    font-size : 14px ;
+                    color: black;
+                    background-color: white;
+                    border: 2px solid black;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    font-size: 14px;
                 }
-                QPushButton : hover {
-                    color : white ;
-                    background-color : #a59ebe ;
-                    border : 2px solid black ;
+                QPushButton:hover {
+                    color: white;
+                    background-color: #a59ebe;
+                    border: 2px solid black;
                 }
             ''')
         self.nextAndBackButtonLayout.addWidget(self.backButton)
@@ -185,7 +184,7 @@ class MakeupUI(QtWidgets.QDialog) :
             path = index_or_path
 
         if not os.path.exists(path) :
-            print(f"⚠️ Image not found : {path}")
+            print(f"⚠️ Image not found: {path}")
             return
 
         pix = util.load_and_scale_pixmap(path, self.preview_w, self.preview_h)
@@ -224,13 +223,13 @@ class MakeupUI(QtWidgets.QDialog) :
             btn.setIconSize(QtCore.QSize(70, 70))
             btn.setStyleSheet('''
                 QPushButton {
-                    border : 2px solid black ;
-                    border-radius : 6px ;
-                    background-color : white ;
+                    border: 2px solid black;
+                    border-radius: 6px;
+                    background-color: white;
                 }
-                QPushButton : hover {
-                    border : 3px solid #a59ebe ;
-                    background-color : #f2e9ff ;
+                QPushButton:hover {
+                    border: 3px solid #a59ebe;
+                    background-color: #f2e9ff;
                 }
             ''')
             layout.addWidget(btn, i // num_columns, i % num_columns)
@@ -250,20 +249,18 @@ class MakeupUI(QtWidgets.QDialog) :
         self.stack.setCurrentIndex(index)
         self.updateNextBackButtons()
 
-    def goBack(self) :
+    def goBack(self):
         index = self.stack.currentIndex()
         if index > 0 :
             self.stack.setCurrentIndex(index - 1)
             self.categoryGroup.buttons()[index - 1].setChecked(True)
         self.updateNextBackButtons()
 
-    def goNext(self) :
+    def goNext(self):
         index = self.stack.currentIndex()
         if index < self.stack.count() - 1 :
             self.stack.setCurrentIndex(index + 1)
             self.categoryGroup.buttons()[index + 1].setChecked(True)
-        elif index == self.stack.count() - 1 :
-            QtWidgets.QMessageBox.information(self, "Let's Do Makeup !", "FINISH")
         self.updateNextBackButtons()
 
     def updateNextBackButtons(self) :
